@@ -6,7 +6,7 @@
     <section class="bg-white py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="max-w-3xl">
-                <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Cake Menu</p> 
+                <p class="text-sm font-bold uppercase tracking-wide text-rose-600"> Menu</p> 
                 <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Choose your perfect cake</h1> 
                 <p class="mt-4 text-lg text-slate-600">
                     Anyone can browse the menu. To place an order or view purchase history, please log in as a customer.
