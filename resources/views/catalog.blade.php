@@ -114,9 +114,6 @@
                                 </label>
                             </div>
 
-                            </div>
-                            </div>
-
                             <div>
                                 <span class="text-sm font-semibold text-slate-700">Contact</span>
                                 <div class="mt-1 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-slate-600">
