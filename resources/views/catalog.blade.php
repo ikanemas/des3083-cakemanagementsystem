@@ -115,15 +115,6 @@
                             </div>
 
                             </div>
-
-                                <label class="block">
-                                    <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
-                                    <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                        @foreach (['Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3)', 'Oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
-                                            <option @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
-                                        @endforeach
-                                    </select>
-                                </label>
                             </div>
 
                             <div>
