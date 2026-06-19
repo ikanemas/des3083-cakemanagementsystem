@@ -39,8 +39,7 @@
 
                         <dl class="mt-5 grid gap-3 text-sm text-slate-600 sm:grid-cols-2">
                             <div><dt class="font-bold text-slate-900">Delivery Date</dt><dd>{{ $order->delivery_date->format('d M Y') }}</dd></div>
-                            <div><dt class="font-bold text-slate-900">Frosting</dt><dd>{{ $order->frosting }}</dd></div>
-                            <div><dt class="font-bold text-slate-900">Fruit Toppings</dt><dd>{{ count($order->toppings ?? []) ? implode(', ', $order->toppings) : 'None' }}</dd></div>
+                            <div><dt class="font-bold text-slate-900">Topping</dt><dd>{{ $order->frosting }}</dd></div>
                             <div><dt class="font-bold text-slate-900">Placed At</dt><dd>{{ $order->created_at->format('d M Y, h:i A') }}</dd></div>
                             <div class="sm:col-span-2"><dt class="font-bold text-slate-900">Address</dt><dd>{{ $order->address }}</dd></div>
                             @if ($order->remark)
