@@ -105,9 +105,9 @@
                                 </div>
 
                                 <label class="block">
-                                    <span class="text-sm font-semibold text-slate-700">Frosting</span>
+                                    <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
                                     <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                        @foreach (['Vanilla Buttercream', 'Chocolate Ganache', 'Cream Cheese', 'Whipped Cream'] as $frosting)
+                                        @foreach (['Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
                                             <option @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
                                         @endforeach
                                     </select>
@@ -121,17 +121,7 @@
                                 </div>
                             </div>
 
-                            <fieldset>
-                                <legend class="text-sm font-semibold text-slate-700">Fruit Toppings</legend>
-                                <div class="mt-2 grid gap-3 sm:grid-cols-3">
-                                    @foreach (['Strawberries', 'Mango', 'Blueberries'] as $topping)
-                                        <label class="flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                                            <input type="checkbox" name="toppings[]" value="{{ $topping }}" @checked(in_array($topping, old('toppings', []), true)) class="mr-2 rounded border-slate-300 text-rose-600">
-                                            {{ $topping }}
-                                        </label>
-                                    @endforeach
-                                </div>
-                            </fieldset>
+                    
 
                             <label class="block">
                                 <span class="text-sm font-semibold text-slate-700">Delivery Address</span>
