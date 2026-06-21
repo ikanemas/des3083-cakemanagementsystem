@@ -14,7 +14,6 @@ return new class extends Migration
             $table->string('category')->default('Cake');
             $table->text('description');
             $table->decimal('price', 8, 2);
-            $table->string('serves')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

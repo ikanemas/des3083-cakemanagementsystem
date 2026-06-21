@@ -12,14 +12,13 @@ test('the public landing page returns a successful response', function () {
         'category' => 'Best Seller',
         'description' => 'Rich chocolate sponge layered with silky fudge cream.',
         'price' => 35,
-        'serves' => '6-8 pax',
         'is_active' => true,
     ]);
 
     $response = $this->get('/');
 
     $response->assertStatus(200);
-    $response->assertSee('Browse Menu');
+    $response->assertSee('See our best sellers');
 });
 
 test('guests can browse the catalog', function () {
@@ -28,14 +27,13 @@ test('guests can browse the catalog', function () {
         'category' => 'Fresh Fruit',
         'description' => 'Light vanilla sponge with whipped cream.',
         'price' => 40,
-        'serves' => '8-10 pax',
         'is_active' => true,
     ]);
 
     $response = $this->get('/catalog');
 
     $response->assertStatus(200);
-    $response->assertSee('Choose your perfect cake');
+    $response->assertSee('Pick your sweet treat');
     $response->assertSee('Login to Order');
 });
 
@@ -83,7 +81,6 @@ test('customers order from the catalog modal and can view history after login', 
         'category' => 'Classic',
         'description' => 'Soft vanilla bean cake finished with buttercream.',
         'price' => 30,
-        'serves' => '6-8 pax',
         'is_active' => true,
     ]);
 
@@ -116,7 +113,6 @@ test('customers can submit orders with sqlite timestamp-style available dates', 
         'category' => 'Best Seller',
         'description' => 'Chocolate cake with fudge cream.',
         'price' => 45,
-        'serves' => '8-10 pax',
         'is_active' => true,
     ]);
 
@@ -150,7 +146,6 @@ test('customers can edit and cancel pending orders from history', function () {
         'category' => 'Best Seller',
         'description' => 'Chocolate cake with ganache.',
         'price' => 38,
-        'serves' => '6-8 pax',
         'is_active' => true,
     ]);
 
@@ -209,7 +204,6 @@ test('customers cannot edit or cancel confirmed orders', function () {
         'category' => 'Classic',
         'description' => 'Vanilla cake with buttercream.',
         'price' => 32,
-        'serves' => '6-8 pax',
         'is_active' => true,
     ]);
 
@@ -286,7 +280,6 @@ test('admins can view order, date, and menu management pages', function () {
         'category' => 'Signature',
         'description' => 'Velvety cocoa cake paired with cream cheese frosting.',
         'price' => 42,
-        'serves' => '8-10 pax',
         'is_active' => true,
     ]);
 

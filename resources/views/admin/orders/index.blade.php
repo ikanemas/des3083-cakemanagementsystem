@@ -8,7 +8,6 @@
             <div>
                 <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Admin</p>
                 <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Manage Orders</h1>
-                <p class="mt-4 text-lg text-slate-600">Orders are grouped by status. Click an order row to expand details and update remarks or status.</p>
             </div>
 
             <div class="mt-8 grid gap-6 xl:grid-cols-2">
@@ -40,7 +39,7 @@
                                             <p class="mt-1 text-sm text-slate-600">{{ $order->user->name }} - {{ $order->delivery_date->format('d M Y') }}</p>
                                         </div>
                                         <div class="flex items-center gap-3 text-sm font-semibold text-slate-500">
-                                            <span>${{ $order->cake_price }}</span>
+                                            <span>RM{{ $order->cake_price }}</span>
                                             <span class="text-slate-400 group-open:hidden">Expand</span>
                                             <span class="hidden text-slate-400 group-open:inline">Collapse</span>
                                         </div>

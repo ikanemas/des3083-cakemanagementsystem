@@ -31,7 +31,7 @@
                             <select name="menu_item_id" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
                                 @foreach ($menuItems as $menuItem)
                                     <option value="{{ $menuItem->id }}" @selected(optional($selectedMenuItem)->id === $menuItem->id)>
-                                        {{ $menuItem->name }} - ${{ $menuItem->price }}
+                                        {{ $menuItem->name }} - RM{{ $menuItem->price }}
                                     </option>
                                 @endforeach
                             </select>
@@ -53,6 +53,7 @@
                         <label class="block">
                             <span class="text-sm font-semibold text-slate-700">Frosting</span>
                             <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
+                                <option>No Toppings</option>
                                 <option>Vanilla Buttercream</option>
                                 <option>Chocolate Ganache</option>
                                 <option>Cream Cheese</option>

@@ -9,13 +9,12 @@
                 <div>
                     <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Admin</p>
                     <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Manage Menu</h1>
-                    <p class="mt-4 text-lg text-slate-600">View menu items at a glance. Add or edit details from a popup.</p>
                 </div>
                 <button type="button" data-open-modal="add-menu-modal" class="rounded-md bg-rose-600 px-5 py-3 font-semibold text-white hover:bg-rose-700">Add Menu Item</button>
             </div>
 
             <div class="mt-8 overflow-hidden rounded-lg border border-slate-200 bg-slate-50">
-                <div class="hidden grid-cols-[1.4fr_1fr_0.7fr_0.8fr_0.8fr] gap-4 border-b border-slate-200 bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-slate-500 lg:grid">
+                <div class="hidden grid-cols-[1.6fr_1fr_0.7fr_0.8fr_0.8fr] gap-4 border-b border-slate-200 bg-white px-5 py-3 text-sm font-bold uppercase tracking-wide text-slate-500 lg:grid">
                     <div>Name</div>
                     <div>Category</div>
                     <div>Price</div>
@@ -25,14 +24,22 @@
 
                 <div class="divide-y divide-slate-200">
                     @forelse ($menuItems as $menuItem)
-                        <article class="grid gap-4 bg-slate-50 px-5 py-4 lg:grid-cols-[1.4fr_1fr_0.7fr_0.8fr_0.8fr] lg:items-center">
-                            <div>
-                                <h2 class="font-bold text-slate-950">{{ $menuItem->name }}</h2>
-                                <p class="mt-1 line-clamp-2 text-sm text-slate-600">{{ $menuItem->description }}</p>
-                                <p class="mt-1 text-xs font-semibold text-slate-500">{{ $menuItem->serves ?: 'Custom size' }}</p>
+                        <article class="grid gap-4 bg-slate-50 px-5 py-4 lg:grid-cols-[1.6fr_1fr_0.7fr_0.8fr_0.8fr] lg:items-center">
+                            <div class="flex gap-4">
+                                <div class="h-20 w-20 shrink-0 overflow-hidden rounded-md bg-slate-200">
+                                    @if ($menuItem->image_path)
+                                        <img src="{{ asset($menuItem->image_path) }}" alt="{{ $menuItem->name }}" class="h-full w-full object-cover">
+                                    @else
+                                        <div class="flex h-full w-full items-center justify-center text-xs font-bold uppercase text-slate-500">No image</div>
+                                    @endif
+                                </div>
+                                <div>
+                                    <h2 class="font-bold text-slate-950">{{ $menuItem->name }}</h2>
+                                    <p class="mt-1 line-clamp-2 text-sm text-slate-600">{{ $menuItem->description }}</p>
+                                </div>
                             </div>
                             <div class="text-sm font-semibold text-slate-700">{{ $menuItem->category }}</div>
-                            <div class="font-bold text-rose-600">${{ $menuItem->price }}</div>
+                            <div class="font-bold text-rose-600">RM{{ $menuItem->price }}</div>
                             <div>
                                 <span class="rounded-full px-3 py-1 text-sm font-bold {{ $menuItem->is_active ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600' }}">
                                     {{ $menuItem->is_active ? 'Visible' : 'Hidden' }}
@@ -66,7 +73,7 @@
                 </div>
                 <button type="button" data-close-modal class="rounded-md border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100">Close</button>
             </div>
-            <form method="POST" action="{{ route('admin.menu.store') }}" class="grid gap-4 px-6 py-6 lg:grid-cols-2">
+            <form method="POST" action="{{ route('admin.menu.store') }}" enctype="multipart/form-data" class="grid gap-4 px-6 py-6 lg:grid-cols-2">
                 @csrf
                 @include('admin.menu.partials.form-fields', ['menuItem' => null])
                 <div class="flex justify-end gap-2 lg:col-span-2">
@@ -87,7 +94,7 @@
                     </div>
                     <button type="button" data-close-modal class="rounded-md border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100">Close</button>
                 </div>
-                <form method="POST" action="{{ route('admin.menu.update', $menuItem) }}" class="grid gap-4 px-6 py-6 lg:grid-cols-2">
+                <form method="POST" action="{{ route('admin.menu.update', $menuItem) }}" enctype="multipart/form-data" class="grid gap-4 px-6 py-6 lg:grid-cols-2">
                     @csrf
                     @method('PUT')
                     @include('admin.menu.partials.form-fields', ['menuItem' => $menuItem])

@@ -7,39 +7,51 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
-    <nav class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-            <a href="{{ route('home') }}" class="text-2xl font-bold text-rose-600">AIFII QASEH HOMEMADE</a>
+    @auth
+        @if (! request()->routeIs('home') && auth()->user()->isAdmin())
+            <nav class="border-b border-slate-200 bg-white">
+                <div class="mx-auto flex min-h-16 max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+                    <a href="{{ route('admin.dashboard') }}" class="text-xl font-bold text-rose-600">AIFII QASEH ADMIN</a>
 
-            <div class="hidden items-center gap-6 md:flex">
-                <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-rose-600">Home</a>
-                <a href="{{ route('catalog') }}" class="font-medium text-slate-600 hover:text-rose-600">Menu</a>
-
-                @auth
-                    @if (auth()->user()->isAdmin())
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-rose-600">Home</a>
+                        <a href="{{ route('catalog') }}" class="font-medium text-slate-600 hover:text-rose-600">Menu</a>
                         <a href="{{ route('admin.orders.index') }}" class="font-medium text-slate-600 hover:text-rose-600">Orders</a>
                         <a href="{{ route('admin.dates.index') }}" class="font-medium text-slate-600 hover:text-rose-600">Dates</a>
                         <a href="{{ route('admin.menu.index') }}" class="font-medium text-slate-600 hover:text-rose-600">Manage Menu</a>
-                    @else
-                        <a href="{{ route('history') }}" class="font-medium text-slate-600 hover:text-rose-600">History</a>
-                    @endif
-                @endauth
-            </div>
+                    </div>
 
-            <div class="flex items-center gap-3">
-                @guest
-                    <a href="{{ route('login') }}" class="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-100">Login</a>
-                    <a href="{{ route('register') }}" class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Register</a>
-                @else
-                    <span class="hidden text-sm text-slate-500 sm:inline">{{ auth()->user()->name }}</span>
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Logout</button>
-                    </form>
-                @endguest
-            </div>
-        </div>
-    </nav>
+                    <div class="flex items-center gap-3">
+                        <span class="hidden text-sm text-slate-500 sm:inline">{{ auth()->user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        @elseif (! request()->routeIs('home'))
+            <nav class="border-b border-slate-200 bg-white">
+                <div class="mx-auto flex min-h-16 max-w-7xl flex-col gap-3 px-4 py-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+                    <a href="{{ route('home') }}" class="text-xl font-bold text-rose-600">AIFII QASEH HOMEMADE</a>
+
+                    <div class="flex flex-wrap items-center gap-4">
+                        <a href="{{ route('home') }}" class="font-medium text-slate-600 hover:text-rose-600">Home</a>
+                        <a href="{{ route('catalog') }}" class="font-medium text-slate-600 hover:text-rose-600">Menu</a>
+                        <a href="{{ route('history') }}" class="font-medium text-slate-600 hover:text-rose-600">History</a>
+                    </div>
+
+                    <div class="flex items-center gap-3">
+                        <span class="hidden text-sm text-slate-500 sm:inline">{{ auth()->user()->name }}</span>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Logout</button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+        @endif
+    @endauth
 
     @if (session('status'))
         <div class="mx-auto mt-6 max-w-7xl px-4 sm:px-6 lg:px-8">

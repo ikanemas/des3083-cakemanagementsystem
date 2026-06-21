@@ -32,7 +32,7 @@
                             <div>
                                 <p class="text-sm font-bold uppercase text-rose-600">{{ $order->order_number }}</p>
                                 <h2 class="mt-2 text-2xl font-bold text-slate-950">{{ $order->cake_name }}</h2>
-                                <p class="mt-1 text-slate-600">${{ $order->cake_price }}</p>
+                                <p class="mt-1 text-slate-600">RM{{ $order->cake_price }}</p>
                             </div>
                             <span class="rounded-full px-3 py-1 text-sm font-bold capitalize {{ $statusClass }}">{{ $order->status }}</span>
                         </div>
@@ -113,7 +113,7 @@
                         <label class="block">
                             <span class="text-sm font-semibold text-slate-700">Frosting</span>
                             <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                @foreach (['Vanilla Buttercream', 'Chocolate Ganache', 'Cream Cheese', 'Whipped Cream'] as $frosting)
+                                @foreach (['No Toppings', 'Vanilla Buttercream', 'Chocolate Ganache', 'Cream Cheese', 'Whipped Cream'] as $frosting)
                                     <option @selected($order->frosting === $frosting)>{{ $frosting }}</option>
                                 @endforeach
                             </select>

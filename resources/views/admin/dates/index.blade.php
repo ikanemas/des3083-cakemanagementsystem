@@ -8,7 +8,6 @@
             <div>
                 <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Admin</p>
                 <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Select Available Dates</h1>
-                <p class="mt-4 text-lg text-slate-600">Click any date from today onward. Green circles are available for customers to choose.</p>
             </div>
 
             <div class="mt-8 flex flex-col gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 sm:flex-row sm:items-center sm:justify-between">

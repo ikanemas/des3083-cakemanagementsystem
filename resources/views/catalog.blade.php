@@ -7,27 +7,34 @@
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="max-w-3xl">
                 <p class="text-sm font-bold uppercase tracking-wide text-rose-600"> Menu</p> 
-                <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Choose your perfect cake</h1> 
-                <p class="mt-4 text-lg text-slate-600">
-                    Anyone can browse the menu. To place an order or view purchase history, please log in as a customer.
-                </p> 
+                <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Pick your sweet treat</h1> 
             </div>
 
             <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 @forelse ($menuItems as $cake)
-                    <article class="flex flex-col rounded-lg border border-slate-200 bg-slate-50 p-6 shadow-sm">
+                    <article class="flex flex-col overflow-hidden rounded-lg border border-slate-200 bg-slate-50 shadow-sm sm:flex-row">
+                        @if ($cake->image_path)
+                            <button type="button" data-image-preview data-image-src="{{ asset($cake->image_path) }}" data-image-alt="{{ $cake->name }}" class="h-44 w-full shrink-0 overflow-hidden bg-slate-200 sm:h-auto sm:w-36">
+                                <img src="{{ asset($cake->image_path) }}" alt="{{ $cake->name }}" class="h-full w-full object-cover transition hover:scale-105">
+                            </button>
+                        @else
+                            <div class="flex h-44 w-full shrink-0 items-center justify-center bg-rose-100 px-3 text-center text-xs font-bold uppercase text-rose-700 sm:h-auto sm:w-36">
+                                Homemade
+                            </div>
+                        @endif
+
+                        <div class="flex min-w-0 flex-1 flex-col p-5">
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <span class="rounded-full bg-rose-100 px-3 py-1 text-xs font-bold uppercase text-rose-700">{{ $cake->category }}</span>
                                 <h2 class="mt-4 text-xl font-bold text-slate-950">{{ $cake->name }}</h2>
                             </div>
-                            <p class="whitespace-nowrap font-bold text-rose-600">${{ $cake->price }}</p>
+                            <p class="whitespace-nowrap font-bold text-rose-600">RM{{ $cake->price }}</p>
                         </div>
 
                         <p class="mt-3 flex-1 text-slate-600">{{ $cake->description }}</p>
 
-                        <div class="mt-6 flex items-center justify-between gap-4">
-                            <span class="text-sm font-semibold text-slate-500">{{ $cake->serves ?: 'Custom size' }}</span>
+                        <div class="mt-6 flex justify-end">
                             @auth
                                 @if (auth()->user()->isAdmin())
                                     <a href="{{ route('admin.menu.index') }}" class="rounded-md bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-700">Manage</a>
@@ -48,6 +55,7 @@
                                 <a href="{{ route('login', ['redirect' => route('catalog', ['order' => $cake->id])]) }}" class="rounded-md bg-rose-600 px-4 py-2 text-sm font-semibold text-white hover:bg-rose-700">Login to Order</a>
                             @endauth
                         </div>
+                        </div>
                     </article>
                 @empty
                     <div class="rounded-lg border border-slate-200 bg-slate-50 p-8 text-slate-600 md:col-span-2 lg:col-span-3">
@@ -57,6 +65,14 @@
             </div>
         </div>
     </section>
+
+    <div id="imagePreviewModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/80 px-4 py-6">
+        <button type="button" id="closeImagePreviewBackdrop" class="absolute inset-0" aria-label="Close image preview"></button>
+        <div class="relative z-10 max-h-full w-full max-w-4xl">
+            <button type="button" id="closeImagePreview" class="absolute right-3 top-3 z-20 rounded-md bg-white px-3 py-1 text-sm font-bold text-slate-950 shadow hover:bg-slate-100">Close</button>
+            <img id="imagePreviewContent" src="" alt="" class="mx-auto max-h-[85vh] w-auto rounded-lg bg-white object-contain shadow-2xl">
+        </div>
+    </div>
 
     @auth
         @if (! auth()->user()->isAdmin())
@@ -107,7 +123,7 @@
                                 <label class="block">
                                     <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
                                     <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                        @foreach (['Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
+                                        @foreach (['No Toppings', 'Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
                                             <option @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
                                         @endforeach
                                     </select>
@@ -148,7 +164,7 @@
                 function openOrderModal(button) {
                     modalMenuItemId.value = button.dataset.id;
                     modalCakeName.textContent = button.dataset.name;
-                    modalCakePrice.textContent = `$${Number(button.dataset.price).toFixed(2)}`;
+                    modalCakePrice.textContent = `RM${Number(button.dataset.price).toFixed(2)}`;
                     orderModal.classList.remove('hidden');
                     orderModal.classList.add('flex');
                 }
@@ -176,4 +192,44 @@
             </script>
         @endif
     @endauth
+
+    <script>
+        const imagePreviewModal = document.getElementById('imagePreviewModal');
+        const imagePreviewContent = document.getElementById('imagePreviewContent');
+        const imagePreviewButtons = document.querySelectorAll('[data-image-preview]');
+        const closeImagePreviewButton = document.getElementById('closeImagePreview');
+        const closeImagePreviewBackdrop = document.getElementById('closeImagePreviewBackdrop');
+
+        function openImagePreview(button) {
+            if (! imagePreviewModal || ! imagePreviewContent) {
+                return;
+            }
+
+            imagePreviewContent.src = button.dataset.imageSrc;
+            imagePreviewContent.alt = button.dataset.imageAlt;
+            imagePreviewModal.classList.remove('hidden');
+            imagePreviewModal.classList.add('flex');
+        }
+
+        function closeImagePreview() {
+            imagePreviewModal?.classList.add('hidden');
+            imagePreviewModal?.classList.remove('flex');
+
+            if (imagePreviewContent) {
+                imagePreviewContent.src = '';
+                imagePreviewContent.alt = '';
+            }
+        }
+
+        imagePreviewButtons.forEach((button) => {
+            button.addEventListener('click', () => openImagePreview(button));
+        });
+        closeImagePreviewButton?.addEventListener('click', closeImagePreview);
+        closeImagePreviewBackdrop?.addEventListener('click', closeImagePreview);
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeImagePreview();
+            }
+        });
+    </script>
 @endsection
