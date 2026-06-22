@@ -137,11 +137,15 @@
                                 </div>
                             </div>
 
-                    
-
                             <label class="block">
                                 <span class="text-sm font-semibold text-slate-700">Delivery Address</span>
                                 <textarea name="address" rows="4" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none" placeholder="Where should we deliver the cake?">{{ old('address') }}</textarea>
+                            </label>
+
+                            <!-- ADDED: Special Remarks Field -->
+                            <label class="block">
+                                <span class="text-sm font-semibold text-slate-700">Special Remarks</span>
+                                <textarea name="remark" rows="3" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none placeholder-slate-400" placeholder="e.g., Please write 'Happy Birthday' on the cake">{{ old('remark') }}</textarea>
                             </label>
 
                             <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

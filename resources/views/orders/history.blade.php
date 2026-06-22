@@ -31,8 +31,9 @@
                         <div class="flex items-start justify-between gap-4">
                             <div>
                                 <p class="text-sm font-bold uppercase text-rose-600">{{ $order->order_number }}</p>
-                                <h2 class="mt-2 text-2xl font-bold text-slate-950">{{ $order->cake_name }}</h2>
-                                <p class="mt-1 text-slate-600">RM{{ $order->cake_price }}</p>
+                                <!-- Converted ID to Name here -->
+                                <h2 class="mt-2 text-2xl font-bold text-slate-950">{{ $order->menuItem->name ?? 'Unknown Cake' }}</h2>
+                                <p class="mt-1 text-slate-600">RM{{ number_format($order->menuItem->price ?? 0, 2) }}</p>
                             </div>
                             <span class="rounded-full px-3 py-1 text-sm font-bold capitalize {{ $statusClass }}">{{ $order->status }}</span>
                         </div>
@@ -42,8 +43,13 @@
                             <div><dt class="font-bold text-slate-900">Topping</dt><dd>{{ $order->frosting }}</dd></div>
                             <div><dt class="font-bold text-slate-900">Placed At</dt><dd>{{ $order->created_at->format('d M Y, h:i A') }}</dd></div>
                             <div class="sm:col-span-2"><dt class="font-bold text-slate-900">Address</dt><dd>{{ $order->address }}</dd></div>
+                            
+                            <!-- Display Special Remarks to the user -->
                             @if ($order->remark)
-                                <div class="sm:col-span-2"><dt class="font-bold text-slate-900">Admin Remark</dt><dd>{{ $order->remark }}</dd></div>
+                                <div class="sm:col-span-2">
+                                    <dt class="font-bold text-slate-900">Special Remarks</dt>
+                                    <dd>{{ $order->remark }}</dd>
+                                </div>
                             @endif
                         </dl>
 
@@ -76,7 +82,7 @@
                 <div class="flex items-start justify-between gap-4 border-b border-slate-200 px-6 py-5">
                     <div>
                         <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Edit Pending Order</p>
-                        <h2 class="mt-1 text-2xl font-extrabold text-slate-950">{{ $order->cake_name }}</h2>
+                        <h2 class="mt-1 text-2xl font-extrabold text-slate-950">{{ $order->menuItem->name ?? 'Unknown Cake' }}</h2>
                         <p class="mt-1 text-slate-600">{{ $order->order_number }}</p>
                     </div>
                     <button type="button" data-close-history-modal class="rounded-md border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100">Close</button>
@@ -110,30 +116,25 @@
                             </div>
                         </div>
 
+                        <!-- Matched Toppings to Menu Options -->
                         <label class="block">
-                            <span class="text-sm font-semibold text-slate-700">Frosting</span>
+                            <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
                             <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                @foreach (['No Toppings', 'Vanilla Buttercream', 'Chocolate Ganache', 'Cream Cheese', 'Whipped Cream'] as $frosting)
+                                @foreach (['No Toppings', 'Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
                                     <option @selected($order->frosting === $frosting)>{{ $frosting }}</option>
                                 @endforeach
                             </select>
                         </label>
 
-                        <fieldset>
-                            <legend class="text-sm font-semibold text-slate-700">Fruit Toppings</legend>
-                            <div class="mt-2 grid gap-3 sm:grid-cols-3">
-                                @foreach (['Strawberries', 'Mango', 'Blueberries'] as $topping)
-                                    <label class="flex items-center rounded-md border border-slate-200 bg-slate-50 px-3 py-2">
-                                        <input type="checkbox" name="toppings[]" value="{{ $topping }}" @checked(in_array($topping, $order->toppings ?? [], true)) class="mr-2 rounded border-slate-300 text-rose-600">
-                                        {{ $topping }}
-                                    </label>
-                                @endforeach
-                            </div>
-                        </fieldset>
-
                         <label class="block">
                             <span class="text-sm font-semibold text-slate-700">Delivery Address</span>
                             <textarea name="address" rows="4" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">{{ $order->address }}</textarea>
+                        </label>
+
+                        <!-- Special Remarks Edit Field -->
+                        <label class="block">
+                            <span class="text-sm font-semibold text-slate-700">Special Remarks</span>
+                            <textarea name="remark" rows="3" class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none placeholder-slate-400" placeholder="e.g., Please write 'Happy Birthday' on the cake">{{ $order->remark }}</textarea>
                         </label>
 
                         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">

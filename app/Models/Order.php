@@ -27,6 +27,7 @@ class Order extends Model
         'address',
         'remark',
         'status',
+        'remark',
     ];
 
     protected function casts(): array

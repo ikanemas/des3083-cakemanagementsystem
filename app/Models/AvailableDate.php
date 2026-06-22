@@ -12,6 +12,7 @@ class AvailableDate extends Model
     protected $fillable = [
         'date',
         'is_available',
+        'capacity',
     ];
 
     protected function casts(): array

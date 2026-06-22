@@ -27,10 +27,18 @@ class CustomerOrderController extends Controller
             'menu_item_id' => ['required', Rule::exists('menu_items', 'id')->where('is_active', true)],
         ]);
 
-        $menuItem = MenuItem::findOrFail($data['menu_item_id']);
+        // 1. Double-check that the date hasn't been fully booked in the last few seconds
+        $availableDate = AvailableDate::whereDate('date', $data['delivery_date'])->first();
+        if (! $availableDate || $availableDate->capacity <= 0 || ! $availableDate->is_available) {
+            return back()->withInput()->withErrors(['delivery_date' => 'Sorry, this date just became fully booked!']);
+        }
 
+        $menuItem = MenuItem::findOrFail($data['menu_item_id']);
+        $cleanCakeName = Str::upper(Str::slug($menuItem->name));
+
+        // 2. Create the order
         Order::create([
-            'order_number' => 'SD-'.now()->format('Ymd').'-'.Str::upper(Str::random(6)),
+            'order_number' => 'SD-'.now()->format('Ymd').'-'.$cleanCakeName.'-'.Str::upper(Str::random(4)),
             'user_id' => $request->user()->id,
             'menu_item_id' => $menuItem->id,
             'cake_name' => $menuItem->name,
@@ -40,12 +48,21 @@ class CustomerOrderController extends Controller
             'toppings' => $data['toppings'] ?? [],
             'phone' => $request->user()->phone,
             'address' => $data['address'],
+            'remark' => $data['remark'] ?? null,
             'status' => Order::STATUS_PENDING,
         ]);
 
-        return redirect()->route('history')->with('status', 'Order placed successfully.');
-    }
+        // 3. Decrease the slot count
+        $availableDate->decrement('capacity');
 
+        // 4. Lock the date if capacity reaches 0
+        if ($availableDate->capacity <= 0) {
+            $availableDate->update(['is_available' => false]);
+        }
+
+        return redirect()->route('history')->with('status', 'Order placed successfully.');
+    }    
+    
     public function update(Request $request, Order $order): RedirectResponse
     {
         $this->authorizeCustomerPendingOrder($request, $order);
@@ -57,6 +74,7 @@ class CustomerOrderController extends Controller
             'frosting' => $data['frosting'],
             'toppings' => $data['toppings'] ?? [],
             'address' => $data['address'],
+            'remark' => $data['remark'] ?? null, 
         ]);
 
         return redirect()->route('history')->with('status', 'Order details updated.');
@@ -69,6 +87,17 @@ class CustomerOrderController extends Controller
         $order->update([
             'status' => Order::STATUS_CANCELLED,
         ]);
+
+        // Free up the slot for that date
+        $availableDate = AvailableDate::whereDate('date', $order->delivery_date)->first();
+        if ($availableDate) {
+            $availableDate->increment('capacity');
+            
+            // Unlock the date if it was previously locked
+            if (! $availableDate->is_available && $availableDate->capacity > 0) {
+                $availableDate->update(['is_available' => true]);
+            }
+        }
 
         return redirect()->route('history')->with('status', 'Order cancelled.');
     }
@@ -95,18 +124,9 @@ class CustomerOrderController extends Controller
             'toppings' => ['array'],
             'toppings.*' => ['string', 'max:100'],
             'address' => ['required', 'string', 'max:1000'],
+            'remark' => ['nullable', 'string', 'max:500'], // <-- Add this line
         ])->after(function ($validator) use ($request): void {
-            if (! $request->filled('delivery_date')) {
-                return;
-            }
-
-            $dateIsAvailable = AvailableDate::whereDate('date', $request->input('delivery_date'))
-                ->where('is_available', true)
-                ->exists();
-
-            if (! $dateIsAvailable) {
-                $validator->errors()->add('delivery_date', 'The selected date is invalid.');
-            }
+            // ... (keep your existing date validation code here)
         })->validate();
     }
 
