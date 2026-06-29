@@ -3,10 +3,14 @@
 @section('title', 'Menu - Aifii Qaseh Homemade')
 
 @section('content')
+    @php
+        $toppingOptions = \App\Support\ToppingOptions::all();
+    @endphp
+
     <section class="bg-white py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="max-w-3xl">
-                <p class="text-sm font-bold uppercase tracking-wide text-rose-600"> Menu</p> 
+                <a href="{{ route('home') }}" class="text-sm font-bold uppercase tracking-wide text-rose-600"> < Back to Home</a>
                 <h1 class="mt-3 text-4xl font-extrabold text-slate-950">Pick your sweet treat</h1> 
             </div>
 
@@ -122,9 +126,9 @@
 
                                 <label class="block">
                                     <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
-                                    <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                        @foreach (['No Toppings', 'Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
-                                            <option @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
+                                    <select name="frosting" id="modalToppingSelect" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
+                                        @foreach ($toppingOptions as $frosting => $price)
+                                            <option value="{{ $frosting }}" data-price="{{ $price }}" @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
                                         @endforeach
                                     </select>
                                 </label>
@@ -162,13 +166,21 @@
                 const modalMenuItemId = document.getElementById('modalMenuItemId');
                 const modalCakeName = document.getElementById('modalCakeName');
                 const modalCakePrice = document.getElementById('modalCakePrice');
+                const modalToppingSelect = document.getElementById('modalToppingSelect');
                 const orderButtons = document.querySelectorAll('[data-order-button]');
                 const autoOpenMenuItemId = @json((string) old('menu_item_id', request('order', '')));
+                let selectedCakeBasePrice = 0;
+
+                function updateModalCakePrice() {
+                    const toppingPrice = Number(modalToppingSelect?.selectedOptions[0]?.dataset.price || 0);
+                    modalCakePrice.textContent = `RM${(selectedCakeBasePrice + toppingPrice).toFixed(2)}`;
+                }
 
                 function openOrderModal(button) {
                     modalMenuItemId.value = button.dataset.id;
                     modalCakeName.textContent = button.dataset.name;
-                    modalCakePrice.textContent = `RM${Number(button.dataset.price).toFixed(2)}`;
+                    selectedCakeBasePrice = Number(button.dataset.price);
+                    updateModalCakePrice();
                     orderModal.classList.remove('hidden');
                     orderModal.classList.add('flex');
                 }
@@ -188,6 +200,7 @@
 
                 document.getElementById('closeOrderModal')?.addEventListener('click', closeOrderModal);
                 document.getElementById('cancelOrderModal')?.addEventListener('click', closeOrderModal);
+                modalToppingSelect?.addEventListener('change', updateModalCakePrice);
                 orderModal?.addEventListener('click', (event) => {
                     if (event.target === orderModal) {
                         closeOrderModal();

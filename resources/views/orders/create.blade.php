@@ -3,6 +3,10 @@
 @section('title', 'Place Order - Aifii Qaseh Homemade')
 
 @section('content')
+    @php
+        $toppingOptions = \App\Support\ToppingOptions::all();
+    @endphp
+
     <main class="bg-white py-12">
         <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
             <div>
@@ -28,9 +32,9 @@
                     <div class="grid gap-5 md:grid-cols-2">
                         <label class="block">
                             <span class="text-sm font-semibold text-slate-700">Cake</span>
-                            <select name="menu_item_id" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
+                            <select name="menu_item_id" id="menuItemSelect" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
                                 @foreach ($menuItems as $menuItem)
-                                    <option value="{{ $menuItem->id }}" @selected(optional($selectedMenuItem)->id === $menuItem->id)>
+                                    <option value="{{ $menuItem->id }}" data-price="{{ $menuItem->price }}" @selected(optional($selectedMenuItem)->id === $menuItem->id)>
                                         {{ $menuItem->name }} - RM{{ $menuItem->price }}
                                     </option>
                                 @endforeach
@@ -51,13 +55,11 @@
 
                     <div class="grid gap-5 md:grid-cols-2">
                         <label class="block">
-                            <span class="text-sm font-semibold text-slate-700">Frosting</span>
-                            <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                <option>No Toppings</option>
-                                <option>Vanilla Buttercream</option>
-                                <option>Chocolate Ganache</option>
-                                <option>Cream Cheese</option>
-                                <option>Whipped Cream</option>
+                            <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
+                            <select name="frosting" id="toppingSelect" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
+                                @foreach ($toppingOptions as $frosting => $price)
+                                    <option value="{{ $frosting }}" data-price="{{ $price }}" @selected(old('frosting') === $frosting)>{{ $frosting }}</option>
+                                @endforeach
                             </select>
                         </label>
 
@@ -86,11 +88,31 @@
                         <textarea name="address" rows="4" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none" placeholder="Where should we deliver the cake?">{{ old('address') }}</textarea>
                     </label>
 
-                    <div class="flex justify-end">
+                    <div class="flex items-center justify-between gap-4">
+                        <p class="font-bold text-slate-900">Total: <span id="orderTotalPrice" class="text-rose-600">RM0.00</span></p>
                         <button class="rounded-md bg-rose-600 px-6 py-3 font-semibold text-white hover:bg-rose-700">Place Order</button>
                     </div>
                 </form>
             @endif
         </div>
     </main>
+
+    <script>
+        const menuItemSelect = document.getElementById('menuItemSelect');
+        const toppingSelect = document.getElementById('toppingSelect');
+        const orderTotalPrice = document.getElementById('orderTotalPrice');
+
+        function updateOrderTotalPrice() {
+            const cakePrice = Number(menuItemSelect?.selectedOptions[0]?.dataset.price || 0);
+            const toppingPrice = Number(toppingSelect?.selectedOptions[0]?.dataset.price || 0);
+
+            if (orderTotalPrice) {
+                orderTotalPrice.textContent = `RM${(cakePrice + toppingPrice).toFixed(2)}`;
+            }
+        }
+
+        menuItemSelect?.addEventListener('change', updateOrderTotalPrice);
+        toppingSelect?.addEventListener('change', updateOrderTotalPrice);
+        updateOrderTotalPrice();
+    </script>
 @endsection

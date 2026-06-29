@@ -3,6 +3,10 @@
 @section('title', 'Purchase History - Aifii Qaseh Homemade')
 
 @section('content')
+    @php
+        $toppingOptions = \App\Support\ToppingOptions::all();
+    @endphp
+
     <main class="bg-white py-12">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -33,7 +37,7 @@
                                 <p class="text-sm font-bold uppercase text-rose-600">{{ $order->order_number }}</p>
                                 <!-- Converted ID to Name here -->
                                 <h2 class="mt-2 text-2xl font-bold text-slate-950">{{ $order->menuItem->name ?? 'Unknown Cake' }}</h2>
-                                <p class="mt-1 text-slate-600">RM{{ number_format($order->menuItem->price ?? 0, 2) }}</p>
+                                <p class="mt-1 text-slate-600">RM{{ number_format($order->cake_price ?? 0, 2) }}</p>
                             </div>
                             <span class="rounded-full px-3 py-1 text-sm font-bold capitalize {{ $statusClass }}">{{ $order->status }}</span>
                         </div>
@@ -84,6 +88,7 @@
                         <p class="text-sm font-bold uppercase tracking-wide text-rose-600">Edit Pending Order</p>
                         <h2 class="mt-1 text-2xl font-extrabold text-slate-950">{{ $order->menuItem->name ?? 'Unknown Cake' }}</h2>
                         <p class="mt-1 text-slate-600">{{ $order->order_number }}</p>
+                        <p class="mt-1 text-slate-600">Total: <span data-history-total-price>RM{{ number_format($order->cake_price ?? 0, 2) }}</span></p>
                     </div>
                     <button type="button" data-close-history-modal class="rounded-md border border-slate-300 px-3 py-1 text-sm font-semibold text-slate-700 hover:bg-slate-100">Close</button>
                 </div>
@@ -119,9 +124,9 @@
                         <!-- Matched Toppings to Menu Options -->
                         <label class="block">
                             <span class="text-sm font-semibold text-slate-700">Topping Deco</span>
-                            <select name="frosting" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
-                                @foreach (['No Toppings', 'Chocolate Flakes (+RM2)', 'Chocolate Ball (+RM2)', 'Kitkat Ball (+RM3)', 'Kitkat Bar (+RM3)', 'Kinder Bueno (+RM5)', 'M&M (+RM3', 'oreo Crunch (+RM3)', 'Almond (+RM4)'] as $frosting)
-                                    <option @selected($order->frosting === $frosting)>{{ $frosting }}</option>
+                            <select name="frosting" data-history-topping-select data-base-price="{{ $order->menuItem->price ?? $order->cake_price ?? 0 }}" required class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 focus:border-rose-500 focus:outline-none">
+                                @foreach ($toppingOptions as $frosting => $price)
+                                    <option value="{{ $frosting }}" data-price="{{ $price }}" @selected($order->frosting === $frosting)>{{ $frosting }}</option>
                                 @endforeach
                             </select>
                         </label>
@@ -150,6 +155,17 @@
     <script>
         const historyModals = document.querySelectorAll('[data-history-modal]');
 
+        function updateHistoryTotalPrice(select) {
+            const modal = select.closest('[data-history-modal]');
+            const totalPrice = modal?.querySelector('[data-history-total-price]');
+            const cakePrice = Number(select.dataset.basePrice || 0);
+            const toppingPrice = Number(select.selectedOptions[0]?.dataset.price || 0);
+
+            if (totalPrice) {
+                totalPrice.textContent = `RM${(cakePrice + toppingPrice).toFixed(2)}`;
+            }
+        }
+
         function closeHistoryModals() {
             historyModals.forEach((modal) => {
                 modal.classList.add('hidden');
@@ -176,6 +192,11 @@
                     closeHistoryModals();
                 }
             });
+        });
+
+        document.querySelectorAll('[data-history-topping-select]').forEach((select) => {
+            select.addEventListener('change', () => updateHistoryTotalPrice(select));
+            updateHistoryTotalPrice(select);
         });
     </script>
 @endsection

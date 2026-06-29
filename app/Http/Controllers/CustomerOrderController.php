@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AvailableDate;
 use App\Models\MenuItem;
 use App\Models\Order;
+use App\Support\ToppingOptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -42,7 +43,7 @@ class CustomerOrderController extends Controller
             'user_id' => $request->user()->id,
             'menu_item_id' => $menuItem->id,
             'cake_name' => $menuItem->name,
-            'cake_price' => $menuItem->price,
+            'cake_price' => ToppingOptions::totalPrice($menuItem->price, $data['frosting']),
             'delivery_date' => $data['delivery_date'],
             'frosting' => $data['frosting'],
             'toppings' => $data['toppings'] ?? [],
@@ -70,6 +71,7 @@ class CustomerOrderController extends Controller
         $data = $this->validatedOrderDetails($request);
 
         $order->update([
+            'cake_price' => ToppingOptions::totalPrice($order->menuItem?->price ?? $order->cake_price, $data['frosting']),
             'delivery_date' => $data['delivery_date'],
             'frosting' => $data['frosting'],
             'toppings' => $data['toppings'] ?? [],

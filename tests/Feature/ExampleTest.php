@@ -135,6 +135,37 @@ test('customers can submit orders with sqlite timestamp-style available dates', 
     expect(Order::where('user_id', $customer->id)->count())->toBe(1);
 });
 
+test('selected topping surcharge is added to the saved order price', function () {
+    $customer = User::factory()->create([
+        'role' => 'customer',
+        'phone' => '012-7777777',
+    ]);
+
+    $menuItem = MenuItem::create([
+        'name' => 'Kinder Chocolate Cake',
+        'category' => 'Best Seller',
+        'description' => 'Chocolate cake ready for extra toppings.',
+        'price' => 45,
+        'is_active' => true,
+    ]);
+
+    $date = today()->addDays(3)->toDateString();
+
+    AvailableDate::create([
+        'date' => $date,
+        'is_available' => true,
+    ]);
+
+    $this->actingAs($customer)->post('/order', [
+        'menu_item_id' => $menuItem->id,
+        'delivery_date' => $date,
+        'frosting' => 'Kinder Bueno (+RM5)',
+        'address' => '123 Cake Street',
+    ])->assertRedirect('/history');
+
+    expect(Order::where('user_id', $customer->id)->first()->cake_price)->toBe('50.00');
+});
+
 test('customers can edit and cancel pending orders from history', function () {
     $customer = User::factory()->create([
         'role' => 'customer',
@@ -176,14 +207,15 @@ test('customers can edit and cancel pending orders from history', function () {
 
     $this->actingAs($customer)->put("/orders/{$order->id}", [
         'delivery_date' => $secondDate,
-        'frosting' => 'Chocolate Ganache',
+        'frosting' => 'Almond (+RM4)',
         'toppings' => ['Mango'],
         'address' => 'New Address',
     ])->assertRedirect('/history');
 
     $order->refresh();
     expect($order->delivery_date->toDateString())->toBe($secondDate);
-    expect($order->frosting)->toBe('Chocolate Ganache');
+    expect($order->frosting)->toBe('Almond (+RM4)');
+    expect($order->cake_price)->toBe('42.00');
     expect($order->toppings)->toBe(['Mango']);
     expect($order->address)->toBe('New Address');
 
